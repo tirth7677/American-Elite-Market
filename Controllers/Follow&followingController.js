@@ -1,9 +1,11 @@
 const User = require("../Models/userModel");
 
-// Follow a user
+// Function to follow a user
 const followUser = async (req, res) => {
   try {
+    // Extract userIdToFollow from request body
     const { userIdToFollow } = req.body;
+    // Extract userId of the current user from request
     const userId = req.user.uuid; // Convert userId to string
 
     // Check if the user to follow exists
@@ -29,11 +31,13 @@ const followUser = async (req, res) => {
       { $addToSet: { followers: userId } }
     );
 
+    // Return success message
     res.status(200).json({
       success: true,
       message: "User followed successfully",
     });
   } catch (error) {
+    // Handle errors
     res.status(error.statusCode || 500).json({
       success: false,
       statusCode: error.statusCode || 500,
@@ -42,10 +46,12 @@ const followUser = async (req, res) => {
   }
 };
 
-// Unfollow a user
+// Function to unfollow a user
 const unfollowUser = async (req, res) => {
   try {
+    // Extract userIdToUnfollow from request body
     const { userIdToUnfollow } = req.body;
+    // Extract userId of the current user from request
     const userId = req.user.uuid; // Convert userId to string
 
     // Check if the user to unfollow exists
@@ -69,11 +75,13 @@ const unfollowUser = async (req, res) => {
       { $pull: { followers: userId } }
     );
 
+    // Return success message
     res.status(200).json({
       success: true,
       message: "User unfollowed successfully",
     });
   } catch (error) {
+    // Handle errors
     res.status(error.statusCode || 500).json({
       success: false,
       statusCode: error.statusCode || 500,
@@ -82,8 +90,10 @@ const unfollowUser = async (req, res) => {
   }
 };
 
+// Function to get details of followers and following for a user
 const getdetailofFF = async (req, res) => {
   try {
+    // Extract userId of the current user from request
     const userId = req.user.uuid; // Assuming userId is extracted from the token in validateToken middleware
 
     // Find the user document corresponding to the userId
@@ -99,12 +109,14 @@ const getdetailofFF = async (req, res) => {
     const followers = user.followers;
     const following = user.following;
 
+    // Return success message with followers and following details
     res.status(200).json({
       success: true,
       followers: followers,
       following: following,
     });
   } catch (error) {
+    // Handle errors
     res.status(error.statusCode || 500).json({
       success: false,
       statusCode: error.statusCode || 500,
@@ -113,4 +125,5 @@ const getdetailofFF = async (req, res) => {
   }
 };
 
+// Export followUser, unfollowUser, and getdetailofFF functions
 module.exports = { followUser, unfollowUser, getdetailofFF };

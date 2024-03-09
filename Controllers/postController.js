@@ -2,12 +2,14 @@ const Post = require("../Models/postModel");
 const User = require("../Models/userModel");
 const mongoose = require("mongoose");
 
+// Function to create a new post
 const createpost = async (req, res) => {
   try {
+    // Extract content and userId from request body
     const { content } = req.body;
     const userId = req.user.uuid; // Assuming userId is extracted from the token in validateToken middleware
 
-    // Create a new post
+    // Create a new post object
     const newPost = new Post({
       content: content,
       user: userId, // Assign the userId to the user field of the post
@@ -16,6 +18,7 @@ const createpost = async (req, res) => {
     // Save the new post to the database
     const savedPost = await newPost.save();
 
+    // Respond with success message and post data
     res.status(201).json({
       success: true,
       message: "Post created successfully",
@@ -25,6 +28,7 @@ const createpost = async (req, res) => {
       },
     });
   } catch (error) {
+    // Handle errors
     res.status(error.statusCode || 500).json({
       success: false,
       statusCode: error.statusCode || 500,
@@ -33,13 +37,16 @@ const createpost = async (req, res) => {
   }
 };
 
+// Function to view posts created by the current user
 const viewpost = async (req, res) => {
   try {
+    // Extract userId of the current user from request
     const userId = req.user.uuid; // Assuming userId is extracted from the token in validateToken middleware
 
     // Fetch posts created by the user with the specified userId, and project only the 'content' field
     const posts = await Post.find({ user: userId }, { content: 1, _id: 0 }); // Include only 'content' field and exclude '_id'
 
+    // Respond with success message and posts data
     res.status(200).json({
       success: true,
       message: "Posts retrieved successfully",
@@ -49,6 +56,7 @@ const viewpost = async (req, res) => {
       },
     });
   } catch (error) {
+    // Handle errors
     res.status(error.statusCode || 500).json({
       success: false,
       statusCode: error.statusCode || 500,
@@ -57,8 +65,10 @@ const viewpost = async (req, res) => {
   }
 };
 
+// Function to update a post
 const updatepost = async (req, res) => {
   try {
+    // Extract postId and content from request body
     const { postId, content } = req.body;
     const userId = req.user.uuid; // Assuming userId is extracted from the token in validateToken middleware
 
@@ -76,6 +86,7 @@ const updatepost = async (req, res) => {
     post.content = content;
     await post.save();
 
+    // Respond with success message and updated post data
     res.status(200).json({
       success: true,
       message: "Post updated successfully",
@@ -85,6 +96,7 @@ const updatepost = async (req, res) => {
       },
     });
   } catch (error) {
+    // Handle errors
     res.status(error.statusCode || 500).json({
       success: false,
       statusCode: error.statusCode || 500,
@@ -93,8 +105,10 @@ const updatepost = async (req, res) => {
   }
 };
 
+// Function to delete a post
 const deletepost = async (req, res) => {
   try {
+    // Extract postId from request body
     const { postId } = req.body;
     const userId = req.user.uuid; // Assuming userId is extracted from the token in validateToken middleware
 
@@ -111,6 +125,7 @@ const deletepost = async (req, res) => {
     // Delete the post
     await Post.deleteOne({ _id: postId });
 
+    // Respond with success message and deleted post data
     res.status(200).json({
       success: true,
       message: "Post deleted successfully",
@@ -120,6 +135,7 @@ const deletepost = async (req, res) => {
       },
     });
   } catch (error) {
+    // Handle errors
     res.status(error.statusCode || 500).json({
       success: false,
       statusCode: error.statusCode || 500,
@@ -128,8 +144,10 @@ const deletepost = async (req, res) => {
   }
 };
 
+// Function to get the latest posts from users the current user is following
 const getLatestPosts = async (req, res) => {
   try {
+    // Extract userId of the current user from request
     const userId = req.user.uuid; // Assuming userId is extracted from the token in validateToken middleware
 
     // Find the user document corresponding to the userId
@@ -149,11 +167,13 @@ const getLatestPosts = async (req, res) => {
       .sort({ createdAt: -1 }) // Sort posts by createdAt in descending order to get the latest ones
       .limit(10); // Limit the number of posts to fetch, adjust as needed
 
+    // Respond with success message and latest posts
     res.status(200).json({
       success: true,
       latestPosts: latestPosts,
     });
   } catch (error) {
+    // Handle errors
     res.status(error.statusCode || 500).json({
       success: false,
       statusCode: error.statusCode || 500,
@@ -162,7 +182,7 @@ const getLatestPosts = async (req, res) => {
   }
 };
 
-
+// Export the functions to be used by other modules
 module.exports = {
   createpost,
   viewpost,
